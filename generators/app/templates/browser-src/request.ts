@@ -24,6 +24,7 @@ export function request<T>(url: string, data: Object, method: string, cvtor: Con
             url: url,
             type: method,
             data: data,
+            contentType: "application/json; charset=utf-8",
             dataType: "json",
             timeout: 15000,
             success: function (result) {
@@ -39,16 +40,6 @@ export function request<T>(url: string, data: Object, method: string, cvtor: Con
                 reject(JSON.stringify({ xhr: xhr, status: status, exception: ex }));
             }
         };
-        if( method === "POST" ){
-            if( typeof data !== "string" ){
-                opt.data = JSON.stringify(data);
-            } else {
-                opt.data = data;
-            }
-            opt.contentType = "application/json; charset=utf-8";
-        } else {
-            opt.data = data;
-        }
         $.ajax(opt);
     });
 }

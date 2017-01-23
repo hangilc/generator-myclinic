@@ -72,7 +72,7 @@ module.exports = Generator.extend({
 		.then(function(){
 			var files = [".gitignore", "browser-src/main.ts", "browser-src/preview-main.ts", "browser-src/request.ts",
 				"browser-src/service.ts",
-				"static/app.css", "views/index.ejs", "views/preview.ejs"];
+				"static/app.css", "static/bundle.js", "static/preview-bundle.js", "views/index.ejs", "views/preview.ejs"];
 			if( gConfig.usePrinter ){
 				files.push("static/drawer-svg.js");
 			}
