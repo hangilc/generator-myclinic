@@ -69,7 +69,7 @@ module.exports = Generator.extend({
 			"browser-src/typed-dom.ts",
 			"static/app.css", "views/index.ejs"];
 		if( gConfig.usePrinter ){
-			staticFiles.push("browser-src/preview-main.ts", "browser-src/print-util.ts", "views/preview.ejs")
+			staticFiles.push("browser-src/print-util.ts", "views/preview.ejs")
 		}
 		staticFiles.forEach(function(src){
 			self.fs.copy(self.templatePath(src), self.destinationPath(src));
@@ -77,7 +77,7 @@ module.exports = Generator.extend({
 		var tmplFiles = ["README.md", "LICENSE.txt", "test-server.js", "browser-src/tsconfig.json",
 			"index.js"];
 		if( gConfig.usePrinter ){
-			tmplFiles.push("browser-src/service.ts")
+			tmplFiles.push("browser-src/service.ts", "browser-src/preview-main.ts")
 		}
 		tmplFiles.forEach(function(file){
 			self.fs.copyTpl(
