@@ -65,7 +65,8 @@ module.exports = Generator.extend({
 			self.destinationPath("package.json"),
 			makePackageJson(gConfig)
 		);
-		var staticFiles = [".gitignore", "browser-src/main.ts", "browser-src/request.ts",
+		self.fs.copy(self.templatePath("_gitignore"), self.destinationPath(".gitignore"));
+		var staticFiles = ["browser-src/main.ts", "browser-src/request.ts",
 			"browser-src/typed-dom.ts",
 			"static/app.css", "views/index.ejs"];
 		if( gConfig.usePrinter ){
