@@ -1,6 +1,6 @@
 import { Compiler, drawerToSvg } from "myclinic-drawer";
 import * as service from "./service";
-import { PrinterWidget, getPrinterSetting } from "./print-util";
+import { PrinterWidget } from "./print-util";
 
 let data = window["data"];
 
@@ -20,7 +20,7 @@ if( previewArea !== null ){
 let printerSettingKey = "<%= subapp %>-printer-setting";
 let printerWidget = document.getElementById("printer-widget");
 if( printerWidget !== null ){
-	let widget = new PrinterWidget(getPrinterSetting(printerSettingKey));
+	let widget = new PrinterWidget(printerSettingKey);
 	widget.setPages([ops]);
 	printerWidget.appendChild(widget.dom);
 }
