@@ -23,7 +23,6 @@ export class PrinterWidget {
 			let settings = await listPrinterSettings();
 			alert(JSON.stringify(settings));
 		})
-		let managePrinter = h.a({}, ["プリンター管理"])
 		this.dom = h.div({}, [
 			printButton,
 			" ",
@@ -32,7 +31,7 @@ export class PrinterWidget {
 			" ",
 			selectPrinter,
 			" ",
-			managePrinter
+			h.a({href: "/printer", target:"printer"}, ["プリンター管理"])
 		]);
 	}
 
