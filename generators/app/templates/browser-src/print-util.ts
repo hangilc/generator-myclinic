@@ -73,6 +73,11 @@ export class PrinterWidget {
 			})
 			appendToElement(form, [opt, setting, " "]);
 		});
+		let cancel = h.button({}, ["キャンセル"]);
+		cancel.addEventListener("click", event => {
+			dom.innerHTML = "";
+		})
+		form.appendChild(cancel);
 		dom.appendChild(form);
 	}
 
