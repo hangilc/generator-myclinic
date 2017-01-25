@@ -20,10 +20,16 @@ export function convertToString(src: any): string {
 
 export function request<T>(url: string, data: Object, method: string, cvtor: Converter<T>){
     return new Promise(function (resolve, reject) {
+        let dataValue: any;
+        if( method === "POST" && typeof data !== "string" ){
+            dataValue = JSON.stringify(data);
+        } else {
+            dataValue = data;
+        }
         let opt = {
             url: url,
             type: method,
-            data: data,
+            data: dataValue,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             timeout: 15000,

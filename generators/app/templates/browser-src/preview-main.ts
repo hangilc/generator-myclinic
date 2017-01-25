@@ -16,4 +16,9 @@ let previewSvg = drawerToSvg(ops, {
 if( previewArea !== null ){
 	previewArea.appendChild(previewSvg);
 }
-//service.print([ops]);
+let printButton = document.getElementById("print-button");
+if( printButton !== null ){
+	printButton.addEventListener("click", event => {
+		service.print([ops]);
+	})
+}
