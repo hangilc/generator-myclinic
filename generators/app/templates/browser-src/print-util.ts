@@ -1,12 +1,15 @@
 import { h } from "./typed-dom";
+import { Op } from "myclinic-drawer";
+import { print } from "./service";
 
 export class PrinterWidget {
 	dom: HTMLElement;
+	private pages: Op[][] = [];
 
 	constructor(){
 		let printButton = h.button({}, ["印刷"]);
 		printButton.addEventListener("click", event => {
-			alert("click");
+			print(this.pages);
 		});
 		let printerName = h.span({}, ["（プリンター未選択）"]);
 		let selectPrinter = h.a({}, ["プリンター選択"])
@@ -21,5 +24,9 @@ export class PrinterWidget {
 			" ",
 			managePrinter
 		]);
+	}
+
+	setPages(pages: Op[][]){
+		this.pages = pages;
 	}
 }

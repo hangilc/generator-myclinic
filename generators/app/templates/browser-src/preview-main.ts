@@ -20,5 +20,6 @@ if( previewArea !== null ){
 let printerWidget = document.getElementById("printer-widget");
 if( printerWidget !== null ){
 	let widget = new PrinterWidget();
+	widget.setPages([ops]);
 	printerWidget.appendChild(widget.dom);
 }
