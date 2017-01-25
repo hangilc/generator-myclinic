@@ -1,5 +1,6 @@
 import { Compiler, drawerToSvg } from "myclinic-drawer";
 import * as service from "./service";
+import { PrinterWidget } from "./print-util";
 
 let data = window["data"];
 
@@ -16,9 +17,8 @@ let previewSvg = drawerToSvg(ops, {
 if( previewArea !== null ){
 	previewArea.appendChild(previewSvg);
 }
-let printButton = document.getElementById("print-button");
-if( printButton !== null ){
-	printButton.addEventListener("click", event => {
-		service.print([ops]);
-	})
+let printerWidget = document.getElementById("printer-widget");
+if( printerWidget !== null ){
+	let widget = new PrinterWidget();
+	printerWidget.appendChild(widget.dom);
 }

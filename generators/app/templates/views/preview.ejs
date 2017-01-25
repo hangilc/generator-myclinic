@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Preview</title>
+	<link rel="stylesheet" href="app.css">
 	<script src="drawer-svg.js"></script>
 	<script>
 		var data = <%- JSON.stringify(data) %>;
@@ -9,7 +10,7 @@
 </head>
 <body>
 <h1>Preview</h1>
-<button id="print-button">印刷</button>
+<div id="printer-widget"></div>
 <div id="preview-wrapper" style="width:210mm;height:297mm;border:1px solid black"></div>
 <script src="preview-bundle.js"></script>
 </body>
