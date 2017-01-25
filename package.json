@@ -20,7 +20,6 @@
     "generators"
   ],
   "dependencies": {
-    "latest-version": "^2.0.0",
     "yeoman-generator": "^1.0.1"
   }
 }

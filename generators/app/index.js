@@ -3,7 +3,6 @@
 var Generator = require("yeoman-generator");
 var fs = require("fs");
 var path = require("path");
-var latestVersion = require("latest-version");
 
 var gConfig = {
 	year: new Date().getFullYear()
@@ -26,7 +25,7 @@ module.exports = Generator.extend({
 			type: "input",
 			name: "name",
 			message: "Your project name:",
-			default: self.appname
+			default: path.basename(process.cwd())
 		}]).then(function(ans){
 			gConfig.name = ans.name;
 			var subapp = gConfig.name.replace(/^myclinic-/, "");
@@ -62,50 +61,90 @@ module.exports = Generator.extend({
 
 	writing: function(){
 		var self = this;
-		return makePackageJson(gConfig)
-		.then(function(pkg){
-			self.fs.writeJSON(
-				self.destinationPath("package.json"),
-				pkg
+		self.fs.writeJSON(
+			self.destinationPath("package.json"),
+			makePackageJson(gConfig)
+		);
+		var staticFiles = [".gitignore", "browser-src/main.ts", "browser-src/request.ts",
+			"static/app.css", "views/index.ejs"];
+		if( gConfig.usePrinter ){
+			staticFiles.push("browser-src/preview-main.ts", "views/preview.ejs" )
+		}
+		staticFiles.forEach(function(src){
+			self.fs.copy(self.templatePath(src), self.destinationPath(src));
+		})
+		var tmplFiles = ["README.md", "LICENSE.txt", "test-server.js", "browser-src/tsconfig.json",
+			"index.js"];
+		if( gConfig.usePrinter ){
+			tmplFiles.push("browser-src/service.ts")
+		}
+		tmplFiles.forEach(function(file){
+			self.fs.copyTpl(
+				self.templatePath(file),
+				self.destinationPath(file),
+				gConfig
 			);
 		})
-		.then(function(){
-			var files = [".gitignore", "browser-src/main.ts", "browser-src/preview-main.ts", "browser-src/request.ts",
-				"browser-src/service.ts",
-				"static/app.css", "static/bundle.js", "static/preview-bundle.js", "views/index.ejs", "views/preview.ejs"];
-			if( gConfig.usePrinter ){
-				files.push("static/drawer-svg.js");
-			}
-			files.forEach(function(src){
-				self.fs.copy(self.templatePath(src), self.destinationPath(src));
-			})
+	},
+
+	install: function(){
+		if( this.skipInstall ){
+			return;
+		}
+		var deps = [
+			"ejs"
+		];
+		var devDeps = [
+			"typescript",
+			"webpack",
+		    "@types/express",
+		    "@types/jquery",
+		    "@types/node",
+		    "jquery",
+		    "kanjidate",
+		    "moment",
+		    "myclinic-consts",
+		    "myclinic-web",
+		    "raw-loader",
+		];
+		if( gConfig.usePrinter ){
+			devDeps.push("myclinic-drawer-print-server", "myclinic-drawer")
+		}
+		var self = this;
+		deps.forEach(function(dep){
+			self.npmInstall(dep, {"save": true});
 		})
-		.then(function(){
-			var files = ["README.md", "LICENSE.txt", "test-server.js", "browser-src/tsconfig.json",
-				"index.js"];
-			files.forEach(function(file){
-				self.fs.copyTpl(
-					self.templatePath(file),
-					self.destinationPath(file),
-					gConfig
-				);
-			})
+		devDeps.forEach(function(dep){
+			self.npmInstall(dep, {"save-dev": true});
 		})
+	},
+
+	end: function(){
+		this.spawnCommandSync("npm", ["run", "build"]);
 	}
 })
 
 function makePackageJson(conf){
-	var pkg = {
+	var scripts = {
+		"build": "npm run compile && npm run bundle",
+		"compile": "tsc -p browser-src",
+	    "test": "echo \"Error: no test specified\" && exit 1"
+	};
+	if( conf.usePrinter ){
+		scripts["bundle"] = "npm run bundle-main && npm run bundle-preview";
+		scripts["bundle-main"] = "webpack browser-src/main.js static/bundle.js";
+		scripts["bundle-preview"] = "webpack browser-src/preview-main.js static/preview-bundle.js";
+	} else {
+		scripts["bundle"] = "npm run bundle-main";
+		scripts["bundle-main"] = "webpack browser-src/main.js static/bundle.js";
+	}
+	scripts["test"] = "echo \"Error: no test specified\" && exit 1";
+	return {
 		name: conf.name,
 		version: "1.0.0",
 		description: conf.description,
 		main: "index.js",
-		scripts: {
-			"compile": "tsc -p browser-src --watch",
-		    "bundle": "webpack browser-src/main.js static/bundle.js --watch",
-		    "bundle-preview": "webpack browser-src/preview-main.js static/preview-bundle.js --watch",
-		    "test": "echo \"Error: no test specified\" && exit 1"
-		},
+		scripts: scripts,
 		repository: {
 		    "type": "git",
 		    "url": "git+ssh://git@github.com/" + conf.githubAccount + "/" + conf.name + ".git"
@@ -117,54 +156,4 @@ function makePackageJson(conf){
 		},
 		homepage: "https://github.com/" + conf.githubAccount + "/" + conf.name + "#readme"
 	};
-	var deps = [
-		"ejs"
-	];
-	var devDeps = [
-		"typescript",
-		"webpack",
-	    "@types/express",
-	    "@types/jquery",
-	    "@types/node",
-	    "jquery",
-	    "kanjidate",
-	    "moment",
-	    "myclinic-consts",
-	    "myclinic-web",
-	    "raw-loader",
-	];
-	if( gConfig.usePrinter ){
-		devDeps.push("myclinic-drawer-print-server", "myclinic-drawer")
-	}
-	return Promise.all(deps.map(function(dep){
-		return latestVersion(dep)
-			.then(function(ver){
-				return {
-					dep: dep,
-					ver: ver
-				}
-			})
-	})).then(function(list){
-		var deps = {};
-		list.forEach(function(bind){
-			deps[bind.dep] = "^" + bind.ver;
-		});
-		pkg.dependencies = deps;
-		return Promise.all(devDeps.map(function(dep){
-			return latestVersion(dep)
-				.then(function(ver){
-					return {
-						dep: dep,
-						ver: ver
-					}
-				})
-		}));
-	}).then(function(list){
-		var deps = {};
-		list.forEach(function(bind){
-			deps[bind.dep] = "^" + bind.ver;
-		});
-		pkg.devDependencies = deps;
-		return pkg;
-	})
 }

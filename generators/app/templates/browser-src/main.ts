@@ -1,3 +1,7 @@
 let params = window["params"];
 
-alert(JSON.stringify(params, null, 2));
+let e = document.getElementById("params");
+if( e !== null ){
+	e.appendChild(document.createTextNode(JSON.stringify(params, null, 2)));
+}
+
