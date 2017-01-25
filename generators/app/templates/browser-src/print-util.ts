@@ -55,6 +55,15 @@ export class PrinterWidget {
 		let dom = this.selectWorkarea;
 		let current = this.settingName;
 		let form = h.form({}, []);
+		{
+			let opt = h.input({type: "radio", name: "printer-setting"}, []);
+			opt.checked = !current;
+			opt.addEventListener("change", event => {
+				this.updateSetting(null);
+				dom.innerHTML = "";
+			})
+			appendToElement(form, [opt, "(プリンター未選択)", " "]);
+		}
 		settings.forEach(setting => {
 			let opt = h.input({type: "radio", name: "printer-setting"}, []);
 			opt.checked = setting === current;
