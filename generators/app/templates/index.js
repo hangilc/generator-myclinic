@@ -7,12 +7,16 @@ function initApp(app, config) {
 	app.set("view engine", "ejs");
 	app.set("views", __dirname + "/views");
 	app.get("/", function(req, res){
-		res.render("index", { params: req.query });
+		res.render("index", { 
+			params: req.query,
+			baseUrl: req.baseUrl
+		});
 	});
 	<% if( usePrinter) { %>
 	app.get("/preview", function(req, res){
 		res.render("preview", {
-			data: {x:10, y:20}
+			data: {x:10, y:20},
+			baseUrl: req.baseUrl
 		});
 	});
 	<% } %>

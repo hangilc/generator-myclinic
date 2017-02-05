@@ -2,15 +2,56 @@ import { h, appendToElement } from "./typed-dom";
 import { Op } from "myclinic-drawer";
 import { print, listPrinterSettings } from "./service";
 
+class Nav {
+	dom: HTMLElement;
+	onPageChange: (number) => void = _ => {};
+
+	constructor(){
+		this.dom = h.span({}, []);
+	}
+
+	update(currentPage: number, totalPages: number){
+		this.dom.innerHTML = "";
+		let prevLink = h.a({}, ["<"]);
+		let nextLink = h.a({}, [">"]);
+		prevLink.addEventListener("click", event => {
+			if( currentPage > 1 ){
+				this.onPageChange(currentPage - 1);
+			}
+		});
+		nextLink.addEventListener("click", event => {
+			if( currentPage < totalPages ){
+				this.onPageChange(currentPage + 1);
+			}
+		});
+		if( totalPages > 1 ){
+			appendToElement(this.dom, [
+				prevLink,
+				" ",
+				`${currentPage} / ${totalPages}`,
+				" ",
+				nextLink
+			]);
+		}
+	}
+}
+
 export class PrinterWidget {
 	dom: HTMLElement;
+	onPageChange: (number) => void = _ => {};
 	private pages: Op[][] = [];
 	private settingKey: string|null = null;
 	private settingName: string|null = null;
+	private nav: Nav;
 	private settingNameSpan: HTMLElement;
 	private selectWorkarea: HTMLElement;
 
 	constructor(settingKey?: string){
+		this.nav = new Nav();
+		this.nav.onPageChange = newPage => {
+			let pageIndex = newPage - 1;
+			this.onPageChange(pageIndex);
+		};
 		if( settingKey !== undefined ){
 			this.settingKey = settingKey;
 			this.settingName = getPrinterSetting(settingKey);
@@ -37,6 +78,8 @@ export class PrinterWidget {
 		this.dom = h.div({}, [
 			printButton,
 			" ",
+			this.nav.dom,
+			" ",
 			"プリンター：",
 			this.settingNameSpan,
 			" ",
@@ -47,8 +90,13 @@ export class PrinterWidget {
 		]);
 	}
 
-	setPages(pages: Op[][]){
+	setPages(pages: Op[][]): void{
+		this.nav.update(1, pages.length);
 		this.pages = pages;
+	}
+
+	updateNavPage(page: number): void {
+		this.nav.update(page, this.pages.length);
 	}
 
 	private fillSelectWorkarea(settings: string[]): void{
