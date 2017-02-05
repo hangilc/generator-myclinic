@@ -94,9 +94,9 @@ module.exports = Generator.extend({
 			return;
 		}
 		var deps = [
-			"ejs"
 		];
 		var devDeps = [
+			"ejs",
 			"typescript",
 			"webpack@^1.14.0",
 		    "@types/express",
